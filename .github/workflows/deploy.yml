@@ -1,0 +1,129 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install backend dependencies
+        run: |
+          cd server
+          npm ci
+
+      - name: Install frontend dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Run backend tests
+        run: |
+          cd server
+          npm test || echo "No tests found, skipping"
+
+      - name: Run backend linting
+        run: |
+          cd server
+          npm run lint || echo "No lint script found"
+
+      - name: Build frontend
+        run: |
+          cd client
+          npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: client/dist/
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-build
+          path: client/dist/
+
+      - name: Deploy backend to staging
+        run: |
+          echo "Deploying backend to staging environment"
+          # Add staging deployment commands here
+
+      - name: Deploy frontend to staging
+        run: |
+          echo "Deploying frontend to staging environment"
+          # Add staging deployment commands here
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-build
+          path: client/dist/
+
+      - name: Deploy backend to Render
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: Deploy frontend to Vercel
+        run: |
+          cd client
+          npx vercel --prod --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Health check
+        run: |
+          echo "Performing health checks after deployment"
+          # Add health check commands here

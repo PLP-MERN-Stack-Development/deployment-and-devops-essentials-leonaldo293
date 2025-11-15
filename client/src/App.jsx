@@ -45,7 +45,7 @@ function App() {
             return;
         }
 
-        const newSocket = io(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/chat`);
+        const newSocket = io('http://localhost:5000/chat');
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
@@ -225,14 +225,13 @@ function App() {
                 placeholder = "Enter your username"
                 value = { username }
                 onChange = {
-                    (e) => setUsername(e.target.value)
-                }
+                    (e) => setUsername(e.target.value) }
                 className = "username-input" /
                 >
                 <
                 button onClick = { connectToChat }
-                className = "connect-btn" > Connect to Chat < /button> < /
-                div >
+                className = "connect-btn" > Connect to Chat < /button> <
+                /div>
             ) : ( <
                 div className = "chat-layout" >
                 <
@@ -252,8 +251,8 @@ function App() {
                 onTyping = { handleTyping }
                 onStopTyping = { handleStopTyping }
                 onMarkAsRead = { markAsRead }
-                /> < /
-                div >
+                /> <
+                /div>
             )
         } <
         /div>

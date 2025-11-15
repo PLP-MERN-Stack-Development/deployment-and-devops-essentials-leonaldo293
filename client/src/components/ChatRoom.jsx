@@ -72,33 +72,42 @@ function ChatRoom({
         <
         div className = "room-header" >
         <
-        h2 > Room: { currentRoom } </h2> <div className = "room-controls" >
+        h2 > Room: { currentRoom } < /h2> <
+        div className = "room-controls" >
         <
         input type = "text"
         placeholder = "New room name"
         value = { newRoom }
         onChange = {
             (e) => setNewRoom(e.target.value) }
-        className = "new-room-input" />
-        <button onClick = { handleJoinRoom }
-        className = "join-room-btn" > Join </button> </div> </div>
+        className = "new-room-input" /
+        >
+        <
+        button onClick = { handleJoinRoom }
+        className = "join-room-btn" > Join < /button> <
+        /div> <
+        /div>
 
-        <div className = "rooms-list" > {
-            rooms.map(room => ( <div key = { room }
+        <
+        div className = "rooms-list" > {
+            rooms.map(room => ( <
+                    div key = { room }
                     className = { `room-item ${room === currentRoom ? 'active' : ''}` }
                     onClick = {
                         () => onJoinRoom(room) } >
                     { room } {
-                        unreadCounts[room] > 0 && < span className = "unread-count" > ({ unreadCounts[room] }) </span>} {
+                        unreadCounts[room] > 0 && < span className = "unread-count" > ({ unreadCounts[room] }) < /span>} {
                                 room !== 'global' && ( <
                                     button onClick = {
                                         (e) => { e.stopPropagation();
                                             handleLeaveRoom(room); } }
-                                    className = "leave-room-btn" > Leave </button>
+                                    className = "leave-room-btn" > Leave < /button>
                                 )
-                            } </div>
+                            } <
+                            /div>
                     ))
-            } </div>
+            } <
+            /div>
 
             <
             div className = "messages-container" >
@@ -113,14 +122,18 @@ function ChatRoom({
                     />
                 ))
             } <
-            div ref = { messagesEndRef }/> </div>
+            div ref = { messagesEndRef }
+            /> <
+            /div>
 
             {
                 typingUsers.length > 0 && ( <
                     div className = "typing-indicator" > { typingUsers.join(', ') } { typingUsers.length === 1 ? 'is' : 'are' }
-                    typing... </div>
+                    typing... <
+                    /div>
                 )
-            } </div>
+            } <
+            /div>
 
             <
             div className = "input-section" >
@@ -133,9 +146,13 @@ function ChatRoom({
                 (e) => { setMessage(e.target.value);
                     handleTyping(); } }
             onKeyPress = { handleKeyPress }
-            className = "message-input" />
-            <button onClick = { handleSendMessage }
-            className = "send-btn" > Send </button> </div> </div>
+            className = "message-input" /
+            >
+            <
+            button onClick = { handleSendMessage }
+            className = "send-btn" > Send < /button> <
+            /div> <
+            /div>
         );
     }
 
